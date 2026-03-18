@@ -8,7 +8,7 @@ export utils, prefs, types, uri
 
 template savePref*(pref, value: string; req: Request; expire=false) =
   if not expire or pref in cookies(req):
-    let sameSite = if cfg.useHttps: SameSite.None else: SameSite.Lax
+    let sameSite = SameSite.Lax
     setCookie(pref, value, daysForward(when expire: -10 else: 360),
               httpOnly=true, secure=cfg.useHttps, sameSite=sameSite, path="/")
 
@@ -26,7 +26,13 @@ template getPath*(): untyped {.dirty.} =
   $(parseUri(request.path) ? filterParams(request.params))
 
 template refPath*(): untyped {.dirty.} =
-  if @"referer".len > 0: @"referer" else: "/"
+  block:
+    let raw = @"referer"
+    if raw.len > 0 and raw.startsWith("/") and not raw.startsWith("//") and
+       not raw.startsWith("/\\"):
+      raw
+    else:
+      "/"
 
 template getCursor*(): string =
   let cursor = @"cursor"
