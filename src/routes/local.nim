@@ -6,7 +6,7 @@ import jester
 
 import router_utils
 import timeline
-import ../[api, apiutils, consts, exporters, formatters, local_data, prefs, query, types, redis_cache, utils]
+import ../[api, apiutils, consts, csrf, exporters, formatters, local_data, prefs, query, types, redis_cache, utils]
 import ../views/[general, identity, local_ui]
 
 const
@@ -86,6 +86,17 @@ template forgetIdentity*(cfg: Config) =
 template skipIdentity*(cfg: Config) =
   setCookie(finchIdentitySkipCookie, "1", daysForward(180), httpOnly=true,
             secure=cfg.useHttps, sameSite=Lax, path="/")
+
+template setCsrfCookie*() {.dirty.} =
+  let csrfToken {.inject.} = generateCsrfToken()
+  setCookie(csrfCookieName, csrfToken, daysForward(1), httpOnly=true,
+            secure=cfg.useHttps, sameSite=Lax, path="/")
+
+template validateCsrf*() {.dirty.} =
+  let csrfCookie = cookies(request).getOrDefault(csrfCookieName)
+  let csrfForm = @csrfFieldName
+  if not csrfTokensMatch(csrfCookie, csrfForm):
+    resp Http403, showError("Invalid or expired form token. Please go back and try again.", cfg)
 
 proc hotCacheNow(): int64 =
   epochTime().int64
@@ -1422,24 +1433,24 @@ template noticeFromRequest*(key: string): untyped =
   of "cleared": "This browser no longer holds a Finch key."
   else: ""
 
-template renderIdentityUi*(identityKey, referer, notice: string; followingCount, listCount: int): untyped =
-  renderIdentityPage(identityKey, referer, notice, followingCount, listCount)
+template renderIdentityUi*(identityKey, referer, notice, csrfToken: string; followingCount, listCount: int): untyped =
+  renderIdentityPage(identityKey, referer, notice, csrfToken, followingCount, listCount)
 
-template renderCollectionsUi*(title, subtitle: string; collections: seq[FinchCollection];
+template renderCollectionsUi*(title, subtitle, csrfToken: string; collections: seq[FinchCollection];
                               canCreate=false): untyped =
-  renderCollectionsIndex(title, subtitle, collections, canCreate)
+  renderCollectionsIndex(title, subtitle, csrfToken, collections, canCreate)
 
 template renderLocalTimelineUi*(collection: FinchCollection; timeline: Timeline; prefs: Prefs;
-                                path, memberScope: string): untyped =
-  renderLocalTimeline(collection, timeline, prefs, path, memberScope)
+                                path, memberScope, csrfToken: string): untyped =
+  renderLocalTimeline(collection, timeline, prefs, path, memberScope, csrfToken)
 
-template renderLocalMembersUi*(collection: FinchCollection; members: seq[FinchCollectionMember]): untyped =
-  renderLocalMembers(collection, members)
+template renderLocalMembersUi*(collection: FinchCollection; members: seq[FinchCollectionMember]; csrfToken: string): untyped =
+  renderLocalMembers(collection, members, csrfToken)
 
 template renderLocalAttentionUi*(collection: FinchCollection; entities: seq[AttentionEntity];
                                  query: Query; memberScope: string; includeMembers: bool;
-                                 sortBy: string): untyped =
-  renderLocalAttention(collection, entities, query, memberScope, includeMembers, sortBy)
+                                 sortBy, csrfToken: string): untyped =
+  renderLocalAttention(collection, entities, query, memberScope, includeMembers, sortBy, csrfToken)
 
 proc extractIdentityKeyFromBundle*(bundle: string): string =
   try:
@@ -1450,6 +1461,7 @@ proc extractIdentityKeyFromBundle*(bundle: string): string =
 proc createLocalRouter*(cfg: Config) =
   router local:
     get "/f/identity":
+      setCsrfCookie()
       let
         identityKey = localCurrentIdentityKey()
         referer = if @"referer".len > 0: @"referer" else: "/"
@@ -1457,20 +1469,22 @@ proc createLocalRouter*(cfg: Config) =
         collections = if ownerId.len > 0: getCollections(ownerId) else: @[]
         followingCount = collections.filterIt(it.kind == following).foldl(a + b.membersCount, 0)
         listCount = collections.countIt(it.kind == localList)
-        html = renderIdentityUi(identityKey, referer, noticeFromRequest(@"notice"), followingCount, listCount)
+        html = renderIdentityUi(identityKey, referer, noticeFromRequest(@"notice"), csrfToken, followingCount, listCount)
       resp renderMain(html, request, cfg, requestPrefs(), "Finch key")
 
     get "/f/lists":
+      setCsrfCookie()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, request.path)
       let
         ownerId = ensureOwner(identityKey)
         collections = getCollections(ownerId, "list")
-        html = renderCollectionsUi("Lists", "Your Finch lists live here and sync to X for live membership and timeline reads.", collections, canCreate=true)
+        html = renderCollectionsUi("Lists", "Your Finch lists live here and sync to X for live membership and timeline reads.", csrfToken, collections, canCreate=true)
       resp renderMain(html, request, cfg, requestPrefs(), "Lists")
 
     get "/f/following":
+      setCsrfCookie()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, request.path)
@@ -1479,10 +1493,11 @@ proc createLocalRouter*(cfg: Config) =
         collection = getOrCreateFollowing(ownerId)
         timeline = await fetchCollectionTimeline(request, collection)
         memberScope = selectedMemberScope(request).join(",")
-        html = renderLocalTimelineUi(collection, timeline, requestPrefs(), getPath(), memberScope)
+        html = renderLocalTimelineUi(collection, timeline, requestPrefs(), getPath(), memberScope, csrfToken)
       resp renderMain(html, request, cfg, requestPrefs(), "Following")
 
     get "/f/following/attention":
+      setCsrfCookie()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, request.path)
@@ -1496,7 +1511,7 @@ proc createLocalRouter*(cfg: Config) =
       var entities = await enrichAttentionEntities(buildAttentionEntities(collection, timeline,
         includeMembers=includeMembers))
       sortAttentionEntities(entities, sortBy)
-      let html = renderLocalAttentionUi(collection, entities, timeline.query, memberScope, includeMembers, sortBy)
+      let html = renderLocalAttentionUi(collection, entities, timeline.query, memberScope, includeMembers, sortBy, csrfToken)
       resp renderMain(html, request, cfg, requestPrefs(), "Following attention")
 
     get "/f/following/attention/live/json":
@@ -1611,6 +1626,7 @@ proc createLocalRouter*(cfg: Config) =
         resp Http404
 
     get "/f/lists/@id":
+      setCsrfCookie()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, request.path)
@@ -1622,10 +1638,11 @@ proc createLocalRouter*(cfg: Config) =
       let
         timeline = await fetchCollectionTimeline(request, collection)
         memberScope = selectedMemberScope(request).join(",")
-        html = renderLocalTimelineUi(collection, timeline, requestPrefs(), getPath(), memberScope)
+        html = renderLocalTimelineUi(collection, timeline, requestPrefs(), getPath(), memberScope, csrfToken)
       resp renderMain(html, request, cfg, requestPrefs(), collection.name)
 
     get "/f/lists/@id/attention":
+      setCsrfCookie()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, request.path)
@@ -1642,7 +1659,7 @@ proc createLocalRouter*(cfg: Config) =
       var entities = await enrichAttentionEntities(buildAttentionEntities(collection, timeline,
         includeMembers=includeMembers))
       sortAttentionEntities(entities, sortBy)
-      let html = renderLocalAttentionUi(collection, entities, timeline.query, memberScope, includeMembers, sortBy)
+      let html = renderLocalAttentionUi(collection, entities, timeline.query, memberScope, includeMembers, sortBy, csrfToken)
       resp renderMain(html, request, cfg, requestPrefs(), collection.name & " attention")
 
     get "/f/lists/@id/attention/live/json":
@@ -1775,6 +1792,7 @@ proc createLocalRouter*(cfg: Config) =
         resp Http404
 
     get "/f/lists/@id/members":
+      setCsrfCookie()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, request.path)
@@ -1783,17 +1801,18 @@ proc createLocalRouter*(cfg: Config) =
         collection = getCollectionById(ownerId, @"id")
       if collection.id.len == 0:
         resp Http404, showError("Local list not found", cfg)
-      let html = renderLocalMembersUi(collection, getCollectionMembers(collection.id))
+      let html = renderLocalMembersUi(collection, getCollectionMembers(collection.id), csrfToken)
       resp renderMain(html, request, cfg, requestPrefs(), collection.name & " members")
 
     get "/f/following/members":
+      setCsrfCookie()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, request.path)
       let
         ownerId = ensureOwner(identityKey)
         collection = getOrCreateFollowing(ownerId)
-      let html = renderLocalMembersUi(collection, getCollectionMembers(collection.id))
+      let html = renderLocalMembersUi(collection, getCollectionMembers(collection.id), csrfToken)
       resp renderMain(html, request, cfg, requestPrefs(), "Following members")
 
     get "/f/lists/@id/members/@fmt":
@@ -1829,12 +1848,14 @@ proc createLocalRouter*(cfg: Config) =
       respJson payload
 
     post "/api/f/identity/create":
+      validateCsrf()
       let key = newIdentityKey()
       discard ensureOwner(key)
       rememberIdentity(key, cfg)
       redirect("/f/identity?notice=created&referer=" & encodeUrl(refPath()))
 
     post "/api/f/identity/import":
+      validateCsrf()
       let key = @"identity_key".strip
       if not validIdentityKey(key):
         resp Http400, showError("Invalid Finch key", cfg)
@@ -1843,14 +1864,17 @@ proc createLocalRouter*(cfg: Config) =
       redirect("/f/identity?notice=imported&referer=" & encodeUrl(refPath()))
 
     post "/api/f/identity/skip":
+      validateCsrf()
       skipIdentity(cfg)
       redirect(refPath())
 
     post "/api/f/identity/clear":
+      validateCsrf()
       forgetIdentity(cfg)
       redirect("/f/identity?notice=cleared&referer=" & encodeUrl(refPath()))
 
     post "/api/f/lists":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -1867,6 +1891,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect("/f/lists/" & collection.id)
 
     post "/api/f/lists/@id/delete":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -1884,6 +1909,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect("/f/lists")
 
     post "/api/f/follow/@username":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -1906,6 +1932,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect(refPath())
 
     post "/api/f/following/members":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -1929,6 +1956,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect(refPath())
 
     post "/api/f/following/attention/hide":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -1938,6 +1966,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect(refPath())
 
     post "/api/f/profile/@username/lists":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -1983,6 +2012,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect(refPath())
 
     post "/api/f/lists/@id/migrate":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -2001,6 +2031,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect("/f/lists/" & collection.id)
 
     post "/api/f/lists/@id/members":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -2027,6 +2058,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect(refPath())
 
     post "/api/f/lists/@id/attention/hide":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -2039,6 +2071,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect(refPath())
 
     post "/api/f/lists/@id/members/@username/remove":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -2057,6 +2090,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect(refPath())
 
     post "/api/f/lists/@id/members/remove":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -2078,6 +2112,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect(refPath())
 
     post "/api/f/lists/@id/members/@username/filters":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -2096,6 +2131,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect(refPath())
 
     post "/api/f/following/members/@username/filters":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -2112,6 +2148,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect(refPath())
 
     post "/api/f/following/members/@username/remove":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -2132,6 +2169,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect(refPath())
 
     post "/api/f/following/members/remove":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -2151,6 +2189,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect(refPath())
 
     post "/api/f/affiliates/@username/following":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -2174,6 +2213,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect(refPath())
 
     post "/api/f/affiliates/@username/lists":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -2218,6 +2258,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect(refPath())
 
     post "/api/f/data/import":
+      validateCsrf()
       let bundle = @"bundle".strip
       if bundle.len == 0:
         redirect("/settings")
@@ -2231,6 +2272,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect("/f/identity?notice=imported&referer=" & encodeUrl(refPath()))
 
     post "/api/f/data/reset":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())
@@ -2241,6 +2283,7 @@ proc createLocalRouter*(cfg: Config) =
       redirect("/settings?referer=" & encodeUrl(refPath()))
 
     post "/api/f/data/delete":
+      validateCsrf()
       let identityKey = localCurrentIdentityKey()
       if identityKey.len == 0:
         requireIdentity(cfg, refPath())

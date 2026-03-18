@@ -3,7 +3,7 @@ import tables, macros, strutils
 import karax/[karaxdsl, vdom]
 
 import renderutils
-import ../types, ../prefs_impl
+import ../[csrf, types, prefs_impl]
 
 macro renderPrefs*(): untyped =
   result = nnkCall.newTree(
@@ -66,11 +66,12 @@ macro renderPrefs*(): untyped =
       result[2].add stmt
 
 proc renderPreferences*(prefs: Prefs; path: string; themes: seq[string];
-                        prefsUrl: string): VNode =
+                        prefsUrl, csrfToken: string): VNode =
   buildHtml(tdiv(class="overlay-panel")):
     fieldset(class="preferences"):
       form(`method`="post", action="/saveprefs", autocomplete="off"):
         refererField path
+        csrfField csrfToken
 
         p(class="settings-subtitle"):
           text "These preferences are stored locally in your browser."
@@ -88,4 +89,4 @@ proc renderPreferences*(prefs: Prefs; path: string; themes: seq[string];
         button(`type`="submit", class="pref-submit"):
           text "Save preferences"
 
-      buttonReferer "/resetprefs", "Reset preferences", path, class="pref-reset"
+      buttonReferer "/resetprefs", "Reset preferences", path, csrfToken, class="pref-reset"

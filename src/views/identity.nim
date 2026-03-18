@@ -2,24 +2,26 @@
 import karax/[karaxdsl, vdom]
 
 import renderutils
-import ".."/types
+import ".."/[csrf, types]
 
-proc renderIdentityPrompt*(): VNode =
+proc renderIdentityPrompt*(csrfToken: string): VNode =
   buildHtml(tdiv(class="overlay-panel")):
     h2: text "Create your Finch key"
     p(class="identity-desc"):
       text "A recovery key syncs your Following and Lists across devices. Skip if you only need public access."
 
     tdiv(class="identity-actions"):
-      form(`method`="post", action="/identity/create", class="identity-form"):
+      form(`method`="post", action="/api/f/identity/create", class="identity-form"):
+        csrfField csrfToken
         button(`type`="submit", class="btn-primary"):
           text "Create key"
 
       tdiv(class="identity-divider"):
         span: text "or"
 
-      form(`method`="post", action="/identity/import", class="identity-form"):
-        input(`type`="text", name="key", placeholder="Paste recovery key",
+      form(`method`="post", action="/api/f/identity/import", class="identity-form"):
+        csrfField csrfToken
+        input(`type`="text", name="identity_key", placeholder="Paste recovery key",
               class="identity-input", autocomplete="off")
         button(`type`="submit", class="btn-secondary"):
           text "Import key"
@@ -28,7 +30,7 @@ proc renderIdentityPrompt*(): VNode =
       a(href="/", class="btn-skip"):
         text "Skip"
 
-proc renderIdentityInfo*(key: string): VNode =
+proc renderIdentityInfo*(key, csrfToken: string): VNode =
   buildHtml(tdiv(class="overlay-panel")):
     h2: text "Your Finch key"
     p(class="identity-desc"):
@@ -36,6 +38,7 @@ proc renderIdentityInfo*(key: string): VNode =
     pre(class="identity-key"):
       text key
     tdiv(class="identity-actions"):
-      form(`method`="post", action="/identity/delete", class="identity-form"):
+      form(`method`="post", action="/api/f/identity/clear", class="identity-form"):
+        csrfField csrfToken
         button(`type`="submit", class="btn-danger"):
           text "Delete key"

@@ -2,6 +2,7 @@
 import strutils, strformat
 import karax/[karaxdsl, vdom, vstyles]
 import ".."/[types, utils]
+import .. / csrf
 
 const smallWebp* = "?name=small&format=webp"
 
@@ -58,9 +59,14 @@ proc hiddenField*(name, value: string): VNode =
 proc refererField*(path: string): VNode =
   hiddenField("referer", path)
 
-proc buttonReferer*(action, text, path: string; class=""; `method`="post"): VNode =
+proc csrfField*(csrfToken: string): VNode =
+  hiddenField(csrfFieldName, csrfToken)
+
+proc buttonReferer*(action, text, path: string; csrfToken=""; class=""; `method`="post"): VNode =
   buildHtml(form(`method`=`method`, action=action, class=class)):
     refererField path
+    if `method`.toLowerAscii == "post":
+      csrfField csrfToken
     button(`type`="submit"):
       text text
 
