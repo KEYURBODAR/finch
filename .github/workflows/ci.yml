@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Nim
+        uses: jiro4989/setup-nim-action@v2
+        with:
+          nim-version: "2.x"
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libsass-dev libpcre3-dev
+
+      - name: Install Nim dependencies
+        run: nimble install -y --depsOnly
+
+      - name: Build release binary
+        run: nimble build -d:release
+
+      - name: Generate SCSS assets
+        run: nimble scss
+
+      - name: Render markdown assets
+        run: nimble md
