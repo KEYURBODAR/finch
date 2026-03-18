@@ -40,10 +40,17 @@ template use*(pool: HttpPool; heads: HttpHeaders; body: untyped): untyped =
   try:
     body
   except BadClientError, ProtocolError:
+    let errMsg = getCurrentExceptionMsg()
+    let errName = getCurrentException().name
+    echo "[http_pool] Retrying after ", errName, ": ", errMsg
     # Twitter returned 503 or closed the connection, we need a new client
     pool.release(c, true)
     badClient = false
     c = pool.acquire(heads)
-    body
+    try:
+      body
+    except BadClientError, ProtocolError:
+      echo "[http_pool] Retry also failed: ", getCurrentExceptionMsg()
+      raise
   finally:
     pool.release(c, badClient)
