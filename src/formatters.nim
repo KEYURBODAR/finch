@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import strutils, strformat, times, uri, tables, xmltree, htmlparser, htmlgen, math, options
+import std/strtabs
 import std/[enumerate, re]
 import types, utils, query
 
@@ -95,8 +96,106 @@ proc stripHtml*(text: string; shorten=false): string =
 proc sanitizeXml*(text: string): string =
   text.replace(illegalXmlRegex, "")
 
+const
+  allowedHtmlTags = [
+    "a", "br", "span", "p", "b", "i", "em", "strong",
+    "blockquote", "img", "video", "source", "div"
+  ]
+  dangerousHtmlTags = [
+    "script", "iframe", "object", "embed", "form", "input", "style"
+  ]
+  containerHtmlTags = ["body", "document", "html"]
+  allowedHtmlAttrs = [
+    "href", "class", "src", "alt", "title", "poster", "autoplay",
+    "muted", "loop", "style", "type", "data-url"
+  ]
+  voidHtmlTags = ["br", "img", "source"]
+
+proc hasValue(values: openArray[string]; value: string): bool =
+  for item in values:
+    if item == value:
+      return true
+
+proc isSafeHtmlUrl(url: string): bool =
+  let normalized = url.strip.toLowerAscii
+  normalized.startsWith("http://") or
+    normalized.startsWith("https://") or
+    (normalized.startsWith("/") and not normalized.startsWith("//"))
+
+proc findHtmlNode(node: XmlNode; tag: string): XmlNode =
+  if node.isNil:
+    return
+
+  if node.kind != xnElement:
+    return
+
+  if node.tag == tag:
+    return node
+
+  for child in node:
+    result = findHtmlNode(child, tag)
+    if not result.isNil:
+      return
+
+proc sanitizeHtmlNode(node: XmlNode): string =
+  if node.isNil:
+    return
+
+  case node.kind
+  of xnText, xnVerbatimText, xnCData, xnEntity:
+    result = xmltree.escape(node.innerText())
+  of xnComment:
+    discard
+  of xnElement:
+    let tag = node.tag.toLowerAscii
+    if dangerousHtmlTags.hasValue(tag):
+      return
+
+    if not allowedHtmlTags.hasValue(tag):
+      return xmltree.escape(node.innerText())
+
+    var attrs = ""
+    let xmlAttrs = node.attrs
+    if not xmlAttrs.isNil:
+      for attrName in allowedHtmlAttrs:
+        if not xmlAttrs.hasKey(attrName):
+          continue
+        let attrValue =
+          if attrName == "href" or attrName == "src": xmlAttrs[attrName].strip
+          else: xmlAttrs[attrName]
+        if (attrName == "href" or attrName == "src") and not isSafeHtmlUrl(attrValue):
+          continue
+        attrs &= " " & attrName & "=\"" & xmltree.escape(attrValue) & "\""
+
+    if voidHtmlTags.hasValue(tag):
+      return "<" & tag & attrs & " />"
+
+    var children = ""
+    for child in node:
+      children &= sanitizeHtmlNode(child)
+    result = "<" & tag & attrs & ">" & children & "</" & tag & ">"
+
+proc sanitizeHtml*(html: string): string =
+  ## Strip dangerous HTML tags and attributes while preserving safe formatting.
+  ## Call BEFORE replaceUrls to ensure user content is safe.
+  if html.len == 0:
+    return
+
+  try:
+    let parsed = parseHtml(html)
+    let body = findHtmlNode(parsed, "body")
+    let root = if body.isNil: parsed else: body
+
+    if root.kind == xnElement and containerHtmlTags.hasValue(root.tag):
+      for child in root:
+        result &= sanitizeHtmlNode(child)
+    else:
+      result = sanitizeHtmlNode(root)
+  except CatchableError:
+    result = xmltree.escape(html)
+
 proc replaceUrls*(body: string; prefs: Prefs; absolute=""): string =
-  result = body
+  result = sanitizeHtml(body)
 
   if prefs.replaceYouTube.len > 0 and "youtu" in result:
     let youtubeHost = strip(prefs.replaceYouTube, chars={'/'})
