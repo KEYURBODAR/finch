@@ -30,6 +30,18 @@ proc failStartup(message: string) =
   stdout.flushFile
   quit(1)
 
+template setSecurityHeaders() =
+  setHeader(result[2], "X-Frame-Options", "DENY")
+  setHeader(result[2], "X-Content-Type-Options", "nosniff")
+  setHeader(result[2], "Referrer-Policy", "no-referrer")
+  setHeader(result[2], "X-XSS-Protection", "0")
+  setHeader(result[2], "Permissions-Policy", "interest-cohort=()")
+  setHeader(result[2], "Content-Security-Policy",
+            "default-src 'self'; img-src 'self' https://*.twimg.com; media-src 'self' blob: https://*.twimg.com; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'")
+  if cfg.useHttps:
+    setHeader(result[2], "Strict-Transport-Security",
+              "max-age=31536000; includeSubDomains")
+
 proc validateRuntime(cfg: Config) =
   if not productionMode():
     return
@@ -92,6 +104,7 @@ routes:
   before:
     # skip all file URLs
     cond "." notin request.path
+    setSecurityHeaders()
     applyUrlPrefs()
 
   get "/go":
