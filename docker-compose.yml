@@ -1,10 +1,9 @@
-version: "3"
-
 services:
 
   nitter:
-    image: zedeus/nitter:latest
-    container_name: nitter
+    build: .
+    image: finch:latest
+    container_name: finch
     ports:
       - "127.0.0.1:8080:8080" # Replace with "8080:8080" if you don't use a reverse proxy
     volumes:
@@ -26,7 +25,7 @@ services:
       - ALL
 
   nitter-redis:
-    image: redis:6-alpine
+    image: redis:7-alpine
     container_name: nitter-redis
     command: redis-server --save 60 1 --loglevel warning
     volumes:
