@@ -1,0 +1,230 @@
+@import "include/variables";
+@import "include/mixins";
+
+.timeline {
+  max-width: $timeline_max;
+  width: 100%;
+
+  & > div {
+    border-bottom: 1px solid $border_subtle;
+  }
+}
+
+.timeline-header {
+  padding: $space_md;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h2 {
+    font-size: $text_lg;
+    font-weight: $weight_semibold;
+    line-height: $leading_tight;
+  }
+}
+
+.timeline-tab {
+  display: flex;
+  border-bottom: 1px solid $border_subtle;
+}
+
+.timeline-tab a,
+.timeline-tab span {
+  flex: 1;
+  text-align: center;
+  padding: $space_sm $space_md;
+  color: $fg_muted;
+  font-size: $text_sm;
+  font-weight: $weight_medium;
+  border-bottom: 2px solid transparent;
+  transition: color $transition_fast $ease_out, border-color $transition_fast $ease_out;
+
+  &:hover {
+    color: $fg_color;
+  }
+
+  &.active {
+    color: $fg_color;
+    border-bottom-color: $accent;
+  }
+}
+
+.show-more {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: $space_sm $space_md;
+  background: $surface_1;
+  color: $accent;
+  font-size: $text_sm;
+  font-weight: $weight_medium;
+  border: none;
+  border-radius: $radius_sm;
+  cursor: pointer;
+  transition: background-color $transition_fast $ease_out, color $transition_fast $ease_out;
+
+  &:hover {
+    background: $surface_2;
+    color: $accent_hover;
+  }
+
+  @include focus-ring();
+
+  a {
+    display: block;
+    padding: $space_sm;
+    color: inherit;
+  }
+}
+
+.timeline-none {
+  padding: $space_2xl $space_lg;
+  text-align: center;
+  color: $fg_muted;
+  font-size: $text_lg;
+  line-height: $leading_normal;
+
+  p {
+    margin-bottom: $space_sm;
+  }
+
+  a {
+    color: $accent;
+    font-weight: $weight_medium;
+
+    &:hover {
+      color: $accent_hover;
+    }
+  }
+}
+
+.timeline-end {
+  padding: $space_lg;
+  text-align: center;
+  color: $fg_faded;
+  font-size: $text_sm;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.skeleton {
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  background: $surface_1;
+  border-radius: $radius_sm;
+}
+
+.skeleton-tweet {
+  padding: $space_md;
+  display: flex;
+  gap: $space_sm;
+
+  .skeleton-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: $radius_full;
+    @extend .skeleton;
+    flex-shrink: 0;
+  }
+
+  .skeleton-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $space_sm;
+  }
+
+  .skeleton-line {
+    @extend .skeleton;
+    height: 14px;
+
+    &:first-child {
+      width: 40%;
+    }
+
+    &:nth-child(2) {
+      width: 90%;
+    }
+
+    &:nth-child(3) {
+      width: 70%;
+    }
+  }
+}
+
+.finch-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space_sm;
+  padding: $space_md;
+
+  a,
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: $space_xs $space_sm;
+    background: $surface_1;
+    color: $fg_muted;
+    border: 1px solid $border_subtle;
+    border-radius: $radius_sm;
+    font-size: $text_sm;
+    font-weight: $weight_medium;
+    transition: background-color $transition_fast $ease_out, color $transition_fast $ease_out, border-color $transition_fast $ease_out;
+
+    &:hover {
+      background: $surface_2;
+      color: $fg_color;
+      border-color: $border_default;
+    }
+
+    &.active,
+    &.current {
+      background: $accent;
+      color: $fg_color;
+      border-color: $accent;
+    }
+
+    &:disabled,
+    &.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    @include focus-ring();
+  }
+}
+
+.thread-line {
+  position: absolute;
+  left: 40px;
+  top: 64px;
+  bottom: 0;
+  width: 2px;
+  background: $accent_muted;
+}
+
+.timeline-item.thread {
+  position: relative;
+}
+
+.tweet-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space_2xl;
+  color: $fg_muted;
+  font-size: $text_sm;
+}
+
+@media (max-width: 700px) {
+  .timeline {
+    max-width: 100%;
+  }
+}

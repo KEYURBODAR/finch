@@ -1,0 +1,167 @@
+@import "../include/variables";
+@import "../include/mixins";
+
+.profile-card {
+  @include surface(1);
+  border: 1px solid $border_subtle;
+  border-radius: $radius_lg;
+  overflow: hidden;
+  margin-bottom: $space_md;
+}
+
+.profile-card-banner {
+  height: 96px;
+  overflow: hidden;
+  background: $surface_2;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.profile-card-body {
+  padding: $space_md;
+  position: relative;
+}
+
+.profile-card-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: $radius_full;
+  overflow: hidden;
+  border: 3px solid $surface_1;
+  margin-top: -44px;
+  background: $surface_1;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.profile-card-name {
+  font-size: $text_base;
+  font-weight: $weight_semibold;
+  margin-top: $space_sm;
+  display: flex;
+  align-items: center;
+  gap: $space_xs;
+  min-width: 0;
+
+  a {
+    color: $fg_color;
+    text-decoration: none;
+    @include ellipsis();
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.profile-card-username {
+  color: $fg_muted;
+  font-size: $text_sm;
+  @include ellipsis();
+}
+
+.profile-card-bio {
+  margin-top: $space_sm;
+  font-size: $text_sm;
+  line-height: $leading_normal;
+  color: $fg_muted;
+  @include breakable();
+
+  a {
+    color: $accent;
+  }
+}
+
+.profile-card-tabs-name {
+  min-width: 0;
+  @include breakable();
+}
+
+.profile-card-fullname {
+  @include ellipsis();
+}
+
+.profile-card-stats {
+  display: flex;
+  gap: $space_md;
+  margin-top: $space_md;
+  padding-top: $space_md;
+  border-top: 1px solid $border_subtle;
+}
+
+.profile-card-stat {
+  text-align: center;
+  flex: 1;
+  text-decoration: none;
+  color: $fg_muted;
+  font-size: $text_xs;
+  transition: color $transition_fast $ease_out;
+
+  &:hover {
+    color: $fg_color;
+  }
+}
+
+.profile-card-stat-num {
+  display: block;
+  font-size: $text_base;
+  font-weight: $weight_bold;
+  color: $fg_color;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 2px;
+}
+
+.profile-card-mini {
+  @include surface(1);
+  border: 1px solid $border_subtle;
+  border-radius: $radius_md;
+  padding: $space_sm $space_md;
+  display: flex;
+  align-items: center;
+  gap: $space_sm;
+  margin-bottom: $space_sm;
+  transition: background-color $transition_fast $ease_out;
+
+  &:hover {
+    background: $surface_2;
+  }
+}
+
+.profile-card-mini-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius_full;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.profile-card-mini-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-card-mini-name {
+  font-size: $text_sm;
+  font-weight: $weight_medium;
+  @include ellipsis();
+}
+
+.profile-card-mini-username {
+  font-size: $text_xs;
+  color: $fg_muted;
+  @include ellipsis();
+}
