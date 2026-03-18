@@ -216,6 +216,17 @@ pre {
   p {
     color: $fg_muted;
   }
+
+  .error-content {
+    display: flex;
+    flex-direction: column;
+    gap: $space_sm;
+  }
+
+  .error-message {
+    font-size: 0.9375rem;
+    line-height: $leading_normal;
+  }
 }
 
 .flash-message {

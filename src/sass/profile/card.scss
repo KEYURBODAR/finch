@@ -49,10 +49,12 @@
   display: flex;
   align-items: center;
   gap: $space_xs;
+  min-width: 0;
 
   a {
     color: $fg_color;
     text-decoration: none;
+    @include ellipsis();
 
     &:hover {
       text-decoration: underline;
@@ -63,6 +65,7 @@
 .profile-card-username {
   color: $fg_muted;
   font-size: $text_sm;
+  @include ellipsis();
 }
 
 .profile-card-bio {
@@ -75,6 +78,15 @@
   a {
     color: $accent;
   }
+}
+
+.profile-card-tabs-name {
+  min-width: 0;
+  @include breakable();
+}
+
+.profile-card-fullname {
+  @include ellipsis();
 }
 
 .profile-card-stats {
