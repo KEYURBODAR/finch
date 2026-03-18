@@ -73,6 +73,9 @@ proc migrate*(key, match: string) {.async.} =
 
 proc initRedisPool*(cfg: Config) {.async.} =
   try:
+    if cfg.redisTls:
+      echo "[redis] WARNING: redisTls is enabled, but the current redis/redpool client does not support TLS yet."
+      # Placeholder until the upstream redis/redpool libraries add TLS support.
     pool = await newRedisPool(cfg.redisConns, cfg.redisMaxConns,
                               host=cfg.redisHost, port=cfg.redisPort,
                               password=cfg.redisPassword)

@@ -126,6 +126,10 @@ proc saveStore() =
   if fileExists(localDataPath):
     removeFile(localDataPath)
   moveFile(tmpPath, localDataPath)
+  try:
+    setFilePermissions(localDataPath, {fpUserRead, fpUserWrite})
+  except OSError:
+    discard
 
 proc ownerIndex(ownerId: string): int =
   for i, owner in localStore.owners:

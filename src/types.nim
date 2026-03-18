@@ -459,6 +459,7 @@ type
     redisPort*: int
     redisConns*: int
     redisMaxConns*: int
+    redisTls*: bool
     redisPassword*: string
 
   Rss* = object
