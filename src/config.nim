@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 import parsecfg except Config
 import os, types, strutils
+import std/sysrand
 
 proc getEnvString(name, default: string): string =
   let value = getEnv(name)
@@ -32,10 +33,17 @@ proc get*[T](config: parseCfg.Config; section, key: string; default: T): T =
   elif T is bool: parseBool(val)
   elif T is string: val
 
+proc randomHmacKey(): string =
+  result = newStringOfCap(64)
+  for b in urandom(32):
+    result.add toHex(b.int, 2).toLowerAscii
+
 proc getConfig*(path: string): (Config, parseCfg.Config) =
   var cfg = loadConfig(path)
 
-  let masterRss = cfg.get("Config", "enableRSS", true)
+  let
+    masterRss = cfg.get("Config", "enableRSS", true)
+    configuredHmacKey = getEnvString("NITTER_HMAC_KEY", cfg.get("Config", "hmacKey", ""))
 
   let conf = Config(
     # Server
@@ -55,10 +63,11 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     redisPort: getEnvInt("NITTER_REDIS_PORT", cfg.get("Cache", "redisPort", 6379)),
     redisConns: getEnvInt("NITTER_REDIS_CONNECTIONS", cfg.get("Cache", "redisConnections", 20)),
     redisMaxConns: getEnvInt("NITTER_REDIS_MAX_CONNECTIONS", cfg.get("Cache", "redisMaxConnections", 30)),
+    redisTls: getEnvBool("NITTER_REDIS_TLS", cfg.get("Cache", "redisTls", false)),
     redisPassword: getEnvString("NITTER_REDIS_PASSWORD", cfg.get("Cache", "redisPassword", "")),
 
     # Config
-    hmacKey: getEnvString("NITTER_HMAC_KEY", cfg.get("Config", "hmacKey", "secretkey")),
+    hmacKey: if configuredHmacKey.len > 0: configuredHmacKey else: randomHmacKey(),
     base64Media: getEnvBool("NITTER_BASE64_MEDIA", cfg.get("Config", "base64Media", false)),
     minTokens: getEnvInt("NITTER_TOKEN_COUNT", cfg.get("Config", "tokenCount", 10)),
     enableRSSUserTweets: masterRss and getEnvBool("NITTER_ENABLE_RSS_USER_TWEETS", cfg.get("Config", "enableRSSUserTweets", true)),
@@ -75,5 +84,8 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     maxConcurrentReqs: getEnvInt("NITTER_MAX_CONCURRENT_REQS", cfg.get("Config", "maxConcurrentReqs", 2)),
     localDataPath: getEnvString("NITTER_LOCAL_DATA_PATH", cfg.get("Config", "localDataPath", "./finch_local.json"))
   )
+
+  if configuredHmacKey.len == 0:
+    echo "[config] WARNING: No hmacKey configured. Using random key — media URLs will break on restart. Set NITTER_HMAC_KEY for production."
 
   return (conf, cfg)

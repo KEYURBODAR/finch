@@ -1,12 +1,14 @@
 # SPDX-License-Identifier: AGPL-3.0-only
+import std/os
 import strutils
 
-const
-  consumerKey* = "3nVuSoBZnx6U4vzUxf5w"
-  consumerSecret* = "Bcs59EFbbsdF6Sl9Ng71smgStWEGwXXKSjYvPVt7qys"
-  bearerToken* = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
-  bearerToken2* = "Bearer AAAAAAAAAAAAAAAAAAAAAFXzAwAAAAAAMHCxpeSDG1gLNLghVe8d74hl6k4%3DRUMF4xAQLsbeBhTSRrCiQpJtxoGWeyHrDb5te2jpGskWDFW82F"
+let
+  consumerKey* = getEnv("NITTER_CONSUMER_KEY", "3nVuSoBZnx6U4vzUxf5w")
+  consumerSecret* = getEnv("NITTER_CONSUMER_SECRET", "Bcs59EFbbsdF6Sl9Ng71smgStWEGwXXKSjYvPVt7qys")
+  bearerToken* = getEnv("NITTER_BEARER_TOKEN", "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA")
+  bearerToken2* = getEnv("NITTER_BEARER_TOKEN2", "Bearer AAAAAAAAAAAAAAAAAAAAAFXzAwAAAAAAMHCxpeSDG1gLNLghVe8d74hl6k4%3DRUMF4xAQLsbeBhTSRrCiQpJtxoGWeyHrDb5te2jpGskWDFW82F")
 
+const
   # GraphQL endpoint IDs — extracted from X's live JS bundle (main.8575d0ba.js)
   # Last updated: 2026-03-15
   # To refresh: bash tools/refresh_endpoints.sh

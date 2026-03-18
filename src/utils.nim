@@ -27,7 +27,7 @@ proc setProxyEncoding*(state: bool) =
   base64Media = state
 
 proc getHmac*(data: string): string =
-  ($hmac(sha256, hmacKey, data))[0 .. 12]
+  $hmac(sha256, hmacKey, data)
 
 proc getVidUrl*(link: string): string =
   if link.len == 0: return
