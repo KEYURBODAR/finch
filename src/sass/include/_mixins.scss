@@ -1,0 +1,153 @@
+@import "variables";
+
+@mixin panel() {
+  background: $surface_1;
+  border: 1px solid $border_default;
+  border-radius: $radius_md;
+  padding: $space_md;
+  margin-bottom: $space_md;
+}
+
+@mixin play-button() {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: $radius_full;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+
+  &::after {
+    content: "";
+    display: block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 12px 0 12px 20px;
+    border-color: transparent transparent transparent $fg_color;
+    margin-left: 4px;
+  }
+}
+
+@mixin breakable() {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+@mixin ellipsis() {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin center-panel() {
+  max-width: $app_shell_max;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: $space_md;
+  padding-right: $space_md;
+}
+
+@mixin input-colors() {
+  background: $bg_color;
+  color: $fg_color;
+  border: 1px solid $border_default;
+  transition: border-color $transition_fast $ease_out;
+
+  &:focus,
+  &:focus-visible {
+    border-color: $accent;
+    box-shadow: 0 0 0 2px $accent_muted;
+  }
+
+  &::placeholder {
+    color: $fg_faded;
+  }
+}
+
+@mixin search-resize() {
+  @media (max-width: 700px) {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+@mixin create-toggle($width: 44px, $height: 24px) {
+  position: relative;
+  display: inline-block;
+  width: $width;
+  height: $height;
+  cursor: pointer;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: $border_default;
+    border-radius: $radius_full;
+    transition: background-color $transition_fast $ease_out;
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: $height - 4px;
+      height: $height - 4px;
+      left: 2px;
+      bottom: 2px;
+      background: $fg_color;
+      border-radius: $radius_full;
+      transition: transform $transition_fast $ease_out;
+    }
+  }
+
+  input:checked + .toggle-slider {
+    background: $accent;
+
+    &::before {
+      transform: translateX($width - $height);
+    }
+  }
+
+  input:focus-visible + .toggle-slider {
+    outline: 2px solid $accent;
+    outline-offset: 2px;
+  }
+}
+
+@mixin focus-ring() {
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: 2px;
+  }
+}
+
+@mixin surface($level: 1) {
+  @if $level == 1 {
+    background: $surface_1;
+  } @else if $level == 2 {
+    background: $surface_2;
+  } @else if $level == 3 {
+    background: $surface_3;
+  } @else {
+    background: $surface_1;
+  }
+}
+
+@mixin line-clamp($lines: 3) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

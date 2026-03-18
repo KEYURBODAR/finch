@@ -1,0 +1,101 @@
+@import "../include/variables";
+@import "../include/mixins";
+
+.quote {
+  border: 1px solid $border_default;
+  border-radius: $radius_md;
+  background: $surface_1;
+  margin-top: $space_sm;
+  overflow: hidden;
+  transition: border-color $transition_fast $ease_out;
+
+  &:hover {
+    border-color: $accent_muted;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
+.quote-link {
+  display: block;
+  padding: $space_sm $space_md;
+}
+
+.quote-header {
+  display: flex;
+  align-items: center;
+  gap: $space_xs;
+  margin-bottom: $space_xs;
+}
+
+.quote-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: $radius_full;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.quote-fullname {
+  font-size: $text_xs;
+  font-weight: $weight_semibold;
+  color: $fg_color;
+  @include ellipsis();
+}
+
+.quote-username {
+  font-size: $text_xs;
+  color: $fg_muted;
+  @include ellipsis();
+}
+
+.quote-date {
+  font-size: $text_xs;
+  color: $fg_muted;
+  margin-left: auto;
+}
+
+.quote-content {
+  font-size: $text_sm;
+  line-height: $leading_normal;
+  color: $fg_color;
+  @include breakable();
+}
+
+.quote-media {
+  margin-top: $space_sm;
+  border-radius: $radius_sm;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    display: block;
+  }
+}
+
+.quote-unavailable {
+  padding: $space_md;
+  color: $fg_muted;
+  font-size: $text_sm;
+  text-align: center;
+}
+
+.quote .verified-icon {
+  width: 14px;
+  height: 14px;
+}
+
+@media (max-width: 700px) {
+  .quote-link {
+    padding: $space_sm;
+  }
+}

@@ -1,0 +1,903 @@
+@import "include/variables";
+@import "include/mixins";
+
+.finch-collection-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space_sm;
+  padding: $space_md;
+}
+
+.finch-collection-card {
+  @include surface(1);
+  border: 1px solid $border_subtle;
+  border-radius: $radius_md;
+  padding: $space_md;
+  transition: background-color $transition_fast $ease_out;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    background: $surface_2;
+  }
+
+  @include focus-ring();
+}
+
+.finch-collection-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space_sm;
+}
+
+.finch-collection-card-title {
+  font-size: $text_base;
+  font-weight: $weight_semibold;
+  color: $fg_color;
+}
+
+.finch-collection-card-count {
+  font-size: $text_xs;
+  color: $fg_muted;
+  font-variant-numeric: tabular-nums;
+}
+
+.finch-collection-card-description {
+  font-size: $text_sm;
+  color: $fg_muted;
+  line-height: $leading_normal;
+  @include line-clamp(2);
+}
+
+.finch-collection-card-meta {
+  display: flex;
+  align-items: center;
+  gap: $space_sm;
+  margin-top: $space_sm;
+  color: $fg_faded;
+  font-size: $text_xs;
+}
+
+.finch-collection-detail {
+  padding: $space_md;
+}
+
+.finch-collection-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $space_lg;
+
+  h1 {
+    font-size: $text_xl;
+    font-weight: $weight_bold;
+  }
+
+  .finch-collection-actions {
+    display: flex;
+    gap: $space_sm;
+  }
+}
+
+.finch-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.finch-table-header {
+  border-bottom: 2px solid $border_default;
+
+  th {
+    padding: $space_sm $space_md;
+    text-align: left;
+    font-size: $text_xs;
+    font-weight: $weight_semibold;
+    color: $fg_muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.finch-table-row {
+  border-bottom: 1px solid $border_subtle;
+  transition: background-color $transition_fast $ease_out;
+
+  &:hover {
+    background: $surface_1;
+  }
+
+  td {
+    padding: $space_sm $space_md;
+    font-size: $text_sm;
+    color: $fg_color;
+    vertical-align: middle;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.finch-table-empty {
+  text-align: center;
+  padding: $space_2xl $space_md;
+  color: $fg_muted;
+  font-size: $text_sm;
+}
+
+.finch-table-actions {
+  display: flex;
+  align-items: center;
+  gap: $space_xs;
+}
+
+.finch-range-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space_xs;
+  margin-bottom: $space_md;
+}
+
+.finch-range-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space_xs $space_md;
+  background: $surface_1;
+  border: 1px solid $border_subtle;
+  border-radius: $radius_full;
+  color: $fg_muted;
+  font-size: $text_xs;
+  font-weight: $weight_medium;
+  cursor: pointer;
+  transition: background-color $transition_fast $ease_out, color $transition_fast $ease_out, border-color $transition_fast $ease_out;
+
+  &:hover {
+    background: $surface_2;
+    color: $fg_color;
+    border-color: $border_default;
+  }
+
+  &.active {
+    background: $accent_muted;
+    color: $fg_color;
+    border-color: $accent;
+  }
+
+  @include focus-ring();
+}
+
+.finch-attention-banner {
+  @include surface(1);
+  border: 1px solid $border_default;
+  border-radius: $radius_md;
+  padding: $space_md;
+  margin-bottom: $space_md;
+  display: flex;
+  align-items: flex-start;
+  gap: $space_md;
+}
+
+.finch-attention-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: $warning;
+}
+
+.finch-attention-content {
+  flex: 1;
+
+  h3 {
+    font-size: $text_sm;
+    font-weight: $weight_semibold;
+    margin-bottom: $space_xs;
+  }
+
+  p {
+    font-size: $text_sm;
+    color: $fg_muted;
+    line-height: $leading_normal;
+  }
+}
+
+.finch-attention-info {
+  border-color: $verified_blue;
+
+  .finch-attention-icon {
+    color: $verified_blue;
+  }
+}
+
+.finch-attention-warning {
+  border-color: $warning;
+
+  .finch-attention-icon {
+    color: $warning;
+  }
+}
+
+.finch-attention-danger {
+  border-color: $danger;
+
+  .finch-attention-icon {
+    color: $danger;
+  }
+}
+
+.finch-attention-success {
+  border-color: $success;
+
+  .finch-attention-icon {
+    color: $success;
+  }
+}
+
+.finch-member-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space_xs;
+}
+
+.finch-member-row {
+  display: flex;
+  align-items: center;
+  gap: $space_md;
+  padding: $space_sm $space_md;
+  border-radius: $radius_sm;
+  transition: background-color $transition_fast $ease_out;
+
+  &:hover {
+    background: $surface_1;
+  }
+}
+
+.finch-member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius_full;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.finch-member-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: $space_xs;
+
+  .finch-member-mini-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: $radius_full;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .finch-member-mini-name {
+    font-size: $text_xs;
+    font-weight: $weight_medium;
+    @include ellipsis();
+  }
+}
+
+.finch-member-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.finch-member-name {
+  font-size: $text_sm;
+  font-weight: $weight_medium;
+  @include ellipsis();
+
+  a {
+    color: $fg_color;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.finch-member-username {
+  font-size: $text_xs;
+  color: $fg_muted;
+  @include ellipsis();
+}
+
+.finch-member-meta {
+  font-size: $text_xs;
+  color: $fg_faded;
+}
+
+.finch-member-actions {
+  display: flex;
+  gap: $space_xs;
+  flex-shrink: 0;
+}
+
+.finch-identity-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: oklch(0% 0 0 / 0.6);
+  padding: $space_md;
+}
+
+.finch-identity-modal-content {
+  @include surface(2);
+  border: 1px solid $border_default;
+  border-radius: $radius_lg;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px oklch(0% 0 0 / 0.4);
+}
+
+.finch-identity-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space_md $space_lg;
+  border-bottom: 1px solid $border_subtle;
+
+  h2 {
+    font-size: $text_lg;
+    font-weight: $weight_semibold;
+  }
+
+  .finch-identity-modal-close {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius_sm;
+    color: $fg_muted;
+    transition: background-color $transition_fast $ease_out, color $transition_fast $ease_out;
+
+    &:hover {
+      background: $surface_3;
+      color: $fg_color;
+    }
+
+    @include focus-ring();
+  }
+}
+
+.finch-identity-modal-body {
+  padding: $space_lg;
+}
+
+.finch-identity-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $space_sm;
+  padding: $space_md $space_lg;
+  border-top: 1px solid $border_subtle;
+}
+
+.finch-identity-card {
+  @include surface(1);
+  border: 1px solid $border_subtle;
+  border-radius: $radius_md;
+  padding: $space_md;
+  margin-bottom: $space_sm;
+  display: flex;
+  align-items: center;
+  gap: $space_md;
+  transition: background-color $transition_fast $ease_out;
+
+  &:hover {
+    background: $surface_2;
+  }
+}
+
+.finch-identity-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: $radius_full;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.finch-identity-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.finch-identity-name {
+  font-size: $text_sm;
+  font-weight: $weight_semibold;
+  @include ellipsis();
+}
+
+.finch-identity-username {
+  font-size: $text_xs;
+  color: $fg_muted;
+}
+
+.finch-identity-actions {
+  display: flex;
+  gap: $space_xs;
+  flex-shrink: 0;
+}
+
+.finch-local-panel {
+  max-width: $app_shell_max;
+  margin: 0 auto;
+  padding: $space_md;
+}
+
+.finch-local-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space_lg;
+
+  h1 {
+    font-size: $text_xl;
+    font-weight: $weight_bold;
+  }
+}
+
+.finch-local-nav {
+  display: flex;
+  gap: $space_xs;
+  margin-bottom: $space_lg;
+  border-bottom: 1px solid $border_subtle;
+}
+
+.finch-local-nav-item {
+  padding: $space_sm $space_md;
+  color: $fg_muted;
+  font-size: $text_sm;
+  font-weight: $weight_medium;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color $transition_fast $ease_out, border-color $transition_fast $ease_out;
+
+  &:hover {
+    color: $fg_color;
+  }
+
+  &.active {
+    color: $fg_color;
+    border-bottom-color: $accent;
+  }
+
+  @include focus-ring();
+}
+
+.finch-local-section {
+  margin-bottom: $space_2xl;
+}
+
+.finch-local-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space_md;
+
+  h2 {
+    font-size: $text_lg;
+    font-weight: $weight_semibold;
+  }
+}
+
+.finch-local-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: $space_md;
+}
+
+.finch-local-empty {
+  text-align: center;
+  padding: $space_2xl;
+  color: $fg_muted;
+  font-size: $text_sm;
+
+  h3 {
+    font-size: $text_lg;
+    color: $fg_color;
+    margin-bottom: $space_sm;
+  }
+}
+
+.finch-import-panel {
+  @include surface(1);
+  border: 1px solid $border_subtle;
+  border-radius: $radius_md;
+  padding: $space_lg;
+  max-width: 480px;
+  margin: 0 auto;
+  text-align: center;
+
+  h2 {
+    font-size: $text_lg;
+    font-weight: $weight_semibold;
+    margin-bottom: $space_sm;
+  }
+
+  p {
+    color: $fg_muted;
+    font-size: $text_sm;
+    margin-bottom: $space_md;
+  }
+}
+
+.finch-import-dropzone {
+  border: 2px dashed $border_default;
+  border-radius: $radius_md;
+  padding: $space_2xl $space_md;
+  margin-bottom: $space_md;
+  transition: border-color $transition_fast $ease_out, background-color $transition_fast $ease_out;
+  cursor: pointer;
+
+  &:hover,
+  &.dragover {
+    border-color: $accent;
+    background: $accent_muted;
+  }
+
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.finch-export-options {
+  display: flex;
+  flex-direction: column;
+  gap: $space_sm;
+}
+
+.finch-export-option {
+  @include surface(1);
+  border: 1px solid $border_subtle;
+  border-radius: $radius_md;
+  padding: $space_md;
+  display: flex;
+  align-items: center;
+  gap: $space_md;
+  cursor: pointer;
+  transition: background-color $transition_fast $ease_out, border-color $transition_fast $ease_out;
+
+  &:hover {
+    background: $surface_2;
+    border-color: $border_default;
+  }
+
+  @include focus-ring();
+
+  .icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $accent;
+    flex-shrink: 0;
+  }
+
+  .info {
+    flex: 1;
+
+    h3 {
+      font-size: $text_sm;
+      font-weight: $weight_medium;
+    }
+
+    p {
+      font-size: $text_xs;
+      color: $fg_muted;
+      margin-bottom: 0;
+    }
+  }
+}
+
+.finch-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: $space_md;
+  margin-bottom: $space_lg;
+}
+
+.finch-stat-card {
+  @include surface(1);
+  border: 1px solid $border_subtle;
+  border-radius: $radius_md;
+  padding: $space_md;
+  text-align: center;
+}
+
+.finch-stat-value {
+  font-size: $text_xl;
+  font-weight: $weight_bold;
+  color: $fg_color;
+  font-variant-numeric: tabular-nums;
+}
+
+.finch-stat-label {
+  font-size: $text_xs;
+  color: $fg_muted;
+  margin-top: $space_xs;
+}
+
+.finch-progress-bar {
+  height: 6px;
+  background: $surface_2;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: $space_sm;
+}
+
+.finch-progress-fill {
+  height: 100%;
+  background: $accent;
+  border-radius: 3px;
+  transition: width $transition_slow $ease_out;
+}
+
+.finch-toolbar {
+  display: flex;
+  align-items: center;
+  gap: $space_sm;
+  padding: $space_sm $space_md;
+  background: $surface_1;
+  border: 1px solid $border_subtle;
+  border-radius: $radius_md;
+  margin-bottom: $space_md;
+  flex-wrap: wrap;
+}
+
+.finch-toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background: $border_subtle;
+}
+
+.finch-toolbar-spacer {
+  flex: 1;
+}
+
+.finch-bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: $space_sm;
+  padding: $space_sm $space_md;
+  background: $accent_muted;
+  border-radius: $radius_md;
+  margin-bottom: $space_md;
+  font-size: $text_sm;
+
+  .count {
+    font-weight: $weight_semibold;
+    color: $fg_color;
+  }
+}
+
+.finch-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: $space_xs;
+  padding: 2px $space_sm;
+  background: $surface_2;
+  border-radius: $radius_full;
+  font-size: $text_xs;
+  color: $fg_muted;
+}
+
+.finch-tag-remove {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius_full;
+  color: $fg_faded;
+  cursor: pointer;
+  transition: color $transition_fast $ease_out, background-color $transition_fast $ease_out;
+
+  &:hover {
+    color: $fg_color;
+    background: $surface_3;
+  }
+}
+
+.finch-toast {
+  position: fixed;
+  bottom: $space_lg;
+  right: $space_lg;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: $space_sm;
+  pointer-events: none;
+}
+
+.finch-toast-item {
+  @include surface(3);
+  border: 1px solid $border_default;
+  border-radius: $radius_md;
+  padding: $space_sm $space_md;
+  box-shadow: 0 4px 16px oklch(0% 0 0 / 0.3);
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: $space_sm;
+  font-size: $text_sm;
+  max-width: 360px;
+  animation: toast-in $transition_base $ease_out;
+
+  &.toast-success {
+    border-color: $success;
+  }
+
+  &.toast-error {
+    border-color: $danger;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.finch-context-menu {
+  position: absolute;
+  z-index: 150;
+  @include surface(3);
+  border: 1px solid $border_default;
+  border-radius: $radius_md;
+  box-shadow: 0 4px 16px oklch(0% 0 0 / 0.3);
+  padding: $space_xs;
+  min-width: 180px;
+}
+
+.finch-context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: $space_sm;
+  padding: $space_sm $space_md;
+  border-radius: $radius_sm;
+  font-size: $text_sm;
+  color: $fg_color;
+  cursor: pointer;
+  transition: background-color $transition_fast $ease_out;
+
+  &:hover {
+    background: $surface_2;
+  }
+
+  &.danger {
+    color: $danger;
+
+    &:hover {
+      background: oklch(25% 0.08 25);
+    }
+  }
+
+  .icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: $fg_muted;
+  }
+
+  @include focus-ring();
+}
+
+.finch-context-menu-separator {
+  height: 1px;
+  background: $border_subtle;
+  margin: $space_xs 0;
+}
+
+.finch-empty-state {
+  text-align: center;
+  padding: $space_3xl $space_md;
+
+  .icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto $space_md;
+    color: $fg_faded;
+  }
+
+  h3 {
+    font-size: $text_lg;
+    font-weight: $weight_semibold;
+    margin-bottom: $space_sm;
+  }
+
+  p {
+    font-size: $text_sm;
+    color: $fg_muted;
+    max-width: 320px;
+    margin: 0 auto $space_md;
+    line-height: $leading_normal;
+  }
+}
+
+@media (max-width: 700px) {
+  .finch-local-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space_sm;
+  }
+
+  .finch-local-nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .finch-local-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .finch-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .finch-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .finch-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .finch-identity-modal-content {
+    max-width: 100%;
+    margin: $space_md;
+    max-height: calc(100vh - #{$space_xl});
+  }
+
+  .finch-toast {
+    left: $space_md;
+    right: $space_md;
+    bottom: $space_md;
+
+    .finch-toast-item {
+      max-width: 100%;
+    }
+  }
+}

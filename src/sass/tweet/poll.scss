@@ -1,0 +1,59 @@
+@import "../include/variables";
+@import "../include/mixins";
+
+.poll-container {
+  margin-top: $space_sm;
+}
+
+.poll-option {
+  display: flex;
+  align-items: center;
+  gap: $space_sm;
+  padding: $space_sm $space_md;
+  position: relative;
+  margin-bottom: $space_xs;
+}
+
+.poll-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: $accent_muted;
+  border-radius: $radius_sm;
+  transition: width $transition_slow $ease_out;
+}
+
+.poll-option-text {
+  position: relative;
+  z-index: 1;
+  font-size: $text_sm;
+  color: $fg_color;
+  flex: 1;
+}
+
+.poll-option-percentage {
+  position: relative;
+  z-index: 1;
+  font-size: $text_sm;
+  font-weight: $weight_semibold;
+  color: $fg_color;
+  font-variant-numeric: tabular-nums;
+}
+
+.poll-info {
+  display: flex;
+  align-items: center;
+  gap: $space_sm;
+  margin-top: $space_sm;
+  color: $fg_muted;
+  font-size: $text_xs;
+}
+
+.poll-leader .poll-bar {
+  background: $accent;
+}
+
+.poll-leader .poll-option-percentage {
+  color: $accent;
+}

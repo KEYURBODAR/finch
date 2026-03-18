@@ -1,0 +1,130 @@
+@import "../include/variables";
+@import "../include/mixins";
+
+.thread-line {
+  position: absolute;
+  left: 40px;
+  top: 64px;
+  bottom: 0;
+  width: 2px;
+  background: $accent_muted;
+}
+
+.timeline-item.thread {
+  position: relative;
+}
+
+.thread-connector {
+  position: absolute;
+  left: 40px;
+  top: 0;
+  height: $space_md;
+  width: 2px;
+  background: $accent_muted;
+}
+
+.thread-last {
+  .thread-line {
+    display: none;
+  }
+}
+
+.more-replies {
+  border-bottom: 1px solid $border_subtle;
+}
+
+.more-replies-text {
+  padding: $space_sm $space_md;
+  margin-left: 58px;
+  color: $fg_muted;
+  font-size: $text_sm;
+
+  a {
+    color: $accent;
+    font-weight: $weight_medium;
+
+    &:hover {
+      color: $accent_hover;
+      text-decoration: underline;
+    }
+  }
+}
+
+.self-thread-context {
+  padding: $space_xs $space_md;
+  margin-left: 58px;
+  color: $fg_muted;
+  font-size: $text_xs;
+}
+
+.thread-info {
+  display: flex;
+  align-items: center;
+  gap: $space_xs;
+  color: $fg_muted;
+  font-size: $text_xs;
+  margin-bottom: $space_xs;
+
+  .icon-container {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.ancestors {
+  border-bottom: 1px solid $border_subtle;
+
+  .timeline-item {
+    .thread-line {
+      top: 64px;
+      bottom: -$space_md;
+    }
+  }
+}
+
+.conversation {
+  .timeline-item {
+    position: relative;
+  }
+
+  .thread-line {
+    top: 0;
+    bottom: -$space_md;
+  }
+
+  .timeline-item:first-child .thread-line {
+    top: 64px;
+  }
+
+  .timeline-item:last-child .thread-line {
+    display: none;
+  }
+}
+
+.replies {
+  border-top: 1px solid $border_subtle;
+
+  .timeline-item:first-child {
+    .thread-connector {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 700px) {
+  .thread-line {
+    left: 36px;
+  }
+
+  .thread-connector {
+    left: 36px;
+  }
+
+  .more-replies-text {
+    margin-left: 0;
+  }
+
+  .self-thread-context {
+    margin-left: 0;
+  }
+}
