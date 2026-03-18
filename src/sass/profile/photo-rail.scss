@@ -1,0 +1,68 @@
+@import "../include/variables";
+@import "../include/mixins";
+
+.photo-rail-card {
+  @include surface(1);
+  border: 1px solid $border_subtle;
+  border-radius: $radius_lg;
+  overflow: hidden;
+  margin-bottom: $space_md;
+}
+
+.photo-rail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space_sm $space_md;
+
+  h2 {
+    font-size: $text_sm;
+    font-weight: $weight_semibold;
+  }
+
+  a {
+    color: $accent;
+    font-size: $text_xs;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.photo-rail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space_xs;
+  padding: 0 $space_xs $space_xs;
+}
+
+.photo-rail-item {
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: $radius_sm;
+  background: $surface_2;
+
+  a {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform $transition_base $ease_out;
+  }
+
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+@media (max-width: 700px) {
+  .photo-rail-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

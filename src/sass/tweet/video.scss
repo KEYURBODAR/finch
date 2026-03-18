@@ -1,0 +1,91 @@
+@import "../include/variables";
+@import "../include/mixins";
+
+.video-container {
+  position: relative;
+  max-width: 533px;
+  border-radius: $radius_md;
+  overflow: hidden;
+  margin-top: $space_sm;
+  background: oklch(5% 0 0);
+
+  video {
+    width: 100%;
+    display: block;
+  }
+}
+
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: oklch(0% 0 0 / 0.25);
+  transition: opacity $transition_fast $ease_out;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  @include play-button();
+}
+
+.video-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $space_sm $space_md;
+  background: linear-gradient(transparent, oklch(0% 0 0 / 0.7));
+  display: flex;
+  align-items: center;
+  gap: $space_sm;
+  opacity: 0;
+  transition: opacity $transition_fast $ease_out;
+
+  .video-container:hover & {
+    opacity: 1;
+  }
+}
+
+.video-time {
+  color: $fg_color;
+  font-size: $text_xs;
+  font-variant-numeric: tabular-nums;
+}
+
+.video-progress {
+  flex: 1;
+  height: 4px;
+  background: oklch(100% 0 0 / 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.video-progress-bar {
+  height: 100%;
+  background: $accent;
+  border-radius: 2px;
+  transition: width 100ms linear;
+}
+
+.video-badge {
+  position: absolute;
+  bottom: $space_sm;
+  left: $space_sm;
+  padding: 2px $space_sm;
+  background: oklch(10% 0.01 250 / 0.8);
+  color: $fg_color;
+  font-size: $text_xs;
+  font-weight: $weight_medium;
+  border-radius: $radius_sm;
+}
+
+@media (max-width: 700px) {
+  .video-container {
+    max-width: 100%;
+  }
+}
