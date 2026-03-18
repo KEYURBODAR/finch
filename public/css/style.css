@@ -39,6 +39,11 @@
 }
 
 *:focus {
+  outline: 2px solid oklch(65% 0.2 25deg);
+  outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
   outline: none;
 }
 
@@ -48,6 +53,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *,
   *::before,
   *::after {
