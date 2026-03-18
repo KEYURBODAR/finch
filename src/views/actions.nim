@@ -14,14 +14,15 @@ proc renderExportControls*(basePath, queryString, formId: string;
         if parts.len == 2:
           result.add (decodeUrl(parts[0]), decodeUrl(parts[1]))
 
-  buildHtml(tdiv(class="page-export-toolbar")):
+  buildHtml(tdiv(class="page-export-toolbar", `data-select-scope`=selectionScope)):
     if includeRss.len > 0:
       menu(class="buttons page-actions"):
         li:
           a(class="page-action button outline small", href=includeRss):
             text "RSS"
 
-    form(`method`="get", action=(basePath & "/json"), class="page-export-form", id=formId):
+    form(`method`="get", action=(basePath & "/json"), class="page-export-form",
+         id=formId, `data-export-form`=""):
       for (name, value) in hiddenPairs():
         input(`type`="hidden", name=name, value=value)
       input(`type`="hidden", name="selected_ids", value="", id=(formId & "-selected"))
@@ -38,15 +39,13 @@ proc renderExportControls*(basePath, queryString, formId: string;
         tdiv(class="page-export-panel"):
           if selectionScope.len > 0:
             tdiv(class="page-export-select-actions"):
+              span(`data-select-count`="", hidden=""):
+                text "0 selected"
               button(`type`="button", class="button outline compact",
-                     `data-checkbox-scope`=selectionScope,
-                     `data-checkbox-action`="select-all",
-                     `data-checkbox-root`=formId):
+                     `data-action`="select-visible"):
                 text "Select visible"
               button(`type`="button", class="button outline compact",
-                     `data-checkbox-scope`=selectionScope,
-                     `data-checkbox-action`="clear",
-                     `data-checkbox-root`=formId):
+                     `data-action`="clear-selection"):
                 text "Clear"
 
           label(class="page-export-limit"):
