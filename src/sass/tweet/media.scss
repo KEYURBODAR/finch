@@ -1,0 +1,160 @@
+@import "../include/variables";
+@import "../include/mixins";
+
+.attachments {
+  margin-top: $space_sm;
+  border-radius: $radius_md;
+  overflow: hidden;
+
+  img,
+  video {
+    display: block;
+    width: 100%;
+  }
+}
+
+.gallery-row {
+  display: flex;
+  gap: 2px;
+  max-width: 533px;
+
+  & + .gallery-row {
+    margin-top: 2px;
+  }
+}
+
+.gallery-gif {
+  max-width: 533px;
+  border-radius: $radius_md;
+  overflow: hidden;
+  position: relative;
+
+  img,
+  video {
+    width: 100%;
+    display: block;
+  }
+}
+
+.attachment {
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+
+  &.image {
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+}
+
+.still-image {
+  position: relative;
+  overflow: hidden;
+  border-radius: $radius_md;
+  max-width: 533px;
+
+  img {
+    width: 100%;
+    display: block;
+  }
+}
+
+.gallery-row .attachment {
+  border-radius: 0;
+}
+
+.gallery-row:first-child .attachment:first-child {
+  border-top-left-radius: $radius_md;
+}
+
+.gallery-row:first-child .attachment:last-child {
+  border-top-right-radius: $radius_md;
+}
+
+.gallery-row:last-child .attachment:first-child {
+  border-bottom-left-radius: $radius_md;
+}
+
+.gallery-row:last-child .attachment:last-child {
+  border-bottom-right-radius: $radius_md;
+}
+
+.alt-text {
+  position: absolute;
+  bottom: $space_sm;
+  left: $space_sm;
+  padding: 2px $space_sm;
+  background: oklch(10% 0.01 250 / 0.8);
+  backdrop-filter: blur(8px);
+  color: $fg_color;
+  font-size: $text_xs;
+  font-weight: $weight_semibold;
+  border-radius: $radius_sm;
+  cursor: pointer;
+  transition: background-color $transition_fast $ease_out;
+
+  &:hover {
+    background: oklch(10% 0.01 250 / 0.95);
+  }
+}
+
+.alt-text-tooltip {
+  position: absolute;
+  bottom: 36px;
+  left: $space_sm;
+  right: $space_sm;
+  padding: $space_sm $space_md;
+  background: $surface_3;
+  border: 1px solid $border_default;
+  border-radius: $radius_md;
+  color: $fg_color;
+  font-size: $text_sm;
+  line-height: $leading_normal;
+  box-shadow: 0 4px 12px oklch(0% 0 0 / 0.3);
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.media-count {
+  position: absolute;
+  bottom: $space_sm;
+  right: $space_sm;
+  padding: 2px $space_sm;
+  background: oklch(10% 0.01 250 / 0.75);
+  color: $fg_color;
+  font-size: $text_xs;
+  font-weight: $weight_medium;
+  border-radius: $radius_sm;
+}
+
+.gif-label {
+  position: absolute;
+  bottom: $space_sm;
+  left: $space_sm;
+  padding: 2px $space_sm;
+  background: oklch(10% 0.01 250 / 0.8);
+  color: $fg_color;
+  font-size: $text_xs;
+  font-weight: $weight_bold;
+  border-radius: $radius_sm;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 700px) {
+  .gallery-row {
+    max-width: 100%;
+  }
+
+  .still-image,
+  .gallery-gif {
+    max-width: 100%;
+  }
+}
